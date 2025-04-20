@@ -25,7 +25,7 @@ import {
   Modal,
   Chip
 } from "@mui/material";
-import { Delete, QrCodeScanner as QrCodeIcon } from "@mui/icons-material";
+import { Delete, QrCodeScanner as QrCodeIcon, Close as CloseIcon } from "@mui/icons-material";
 import * as classService from "../../services/classService";
 import * as attendanceService from "../../services/attendanceService";
 import { useParams, useNavigate } from "react-router-dom";
@@ -66,10 +66,11 @@ const ClassSchedule = () => {
   const [qrLoading, setQrLoading] = useState(false);
   const [qrError, setQrError] = useState(null);
   const [selectedScheduleForQr, setSelectedScheduleForQr] = useState(null);
-  const [qrZoomLevel, setQrZoomLevel] = useState(1);
   const [openDurationDialog, setOpenDurationDialog] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState(15);
   const [scheduleToGenerateQrFor, setScheduleToGenerateQrFor] = useState(null);
+  const [openZoomedQrModal, setOpenZoomedQrModal] = useState(false);
+  const [zoomedQrCodeUrl, setZoomedQrCodeUrl] = useState("");
 
   const fetchSchedules = useCallback(async () => {
     if (!classId) {
@@ -192,7 +193,6 @@ const ClassSchedule = () => {
     setQrCodeUrl("");
     setQrError(null);
     setSelectedScheduleForQr(null);
-    setQrZoomLevel(1);
   };
 
   const handleCloseDurationDialog = () => {
@@ -223,7 +223,6 @@ const ClassSchedule = () => {
 
     handleCloseDurationDialog();
     setSelectedScheduleForQr(scheduleToGenerateQrFor);
-    setQrZoomLevel(1);
     setQrLoading(true);
     setQrError(null);
     setQrCodeUrl("");
@@ -258,6 +257,16 @@ const ClassSchedule = () => {
   const handleCloseSnackbar = (event, reason) => {
     if (reason === "clickaway") return;
     setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleOpenZoomedQrModal = (url) => {
+    setZoomedQrCodeUrl(url);
+    setOpenZoomedQrModal(true);
+  };
+
+  const handleCloseZoomedQrModal = () => {
+    setOpenZoomedQrModal(false);
+    setZoomedQrCodeUrl("");
   };
 
   if (!classId) {
@@ -526,7 +535,7 @@ const ClassSchedule = () => {
             id="qr-modal-title"
             variant="h6"
             component="h2"
-            sx={{ mb: 2 }}
+            sx={{ mb: 2, fontWeight: 600, color: 'primary.main', textAlign: 'center' }}
           >
             Mã QR Điểm Danh
           </Typography>
@@ -549,6 +558,8 @@ const ClassSchedule = () => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
+                  justifyContent: "center",
+                  gap: 2,
                 }}
               >
                 <DialogContentText sx={{ mb: 2,color: 'text.secondary' }}>
@@ -575,6 +586,7 @@ const ClassSchedule = () => {
                     width: '100%',
                     maxWidth: '500px',
                     mx: 'auto'
+
                   }}
                 >
                   {durationMinutes > 0 && (
@@ -596,15 +608,16 @@ const ClassSchedule = () => {
                     src={qrCodeUrl}
                     alt="Mã QR điểm danh"
                     style={{
-                      isplay: "block",
+                      display: "block",
+                      margin: "0 auto",
                       maxWidth: "100%",
                       height: "auto",
-                      transform: `scale(${qrZoomLevel})`,
-                      transition: "transform 0.2s ease-in-out",
-                      imageRendering: 'crisp-edges',
-                      border: '8px solid white',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                      imageRendering: "crisp-edges",
+                      border: "8px solid white",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      cursor: "pointer",
                     }}
+                    onClick={() => handleOpenZoomedQrModal(qrCodeUrl)} 
                   />
                 </Box>
               </Box>
@@ -613,32 +626,6 @@ const ClassSchedule = () => {
               <Typography sx={{ my: 4 }}>
                 Không có mã QR để hiển thị.
               </Typography>
-            )}
-
-            {qrCodeUrl && !qrLoading && !qrError && (
-              <Box
-                sx={{
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 2, 
-                  px: 1,
-                  width: '100%',
-                  maxWidth: 400,
-                  mx: 'auto'
-                }}
-              >
-                <Typography variant="caption">Zoom:</Typography>
-                <Slider
-                 value={qrZoomLevel}
-                 onChange={handleZoomChange}
-                 aria-labelledby="qr-zoom-slider"
-                 min={0.5}
-                 max={3}
-                 step={0.1}
-                 sx={{ flexGrow: 1 }}
-                 marks={[{ value: 1, label: '100%' }]}
-                />
-              </Box>
             )}
           </Box>
 
@@ -654,6 +641,51 @@ const ClassSchedule = () => {
             <Button onClick={handleCloseQrDialog}>Đóng</Button>
           </Box>
         </Paper>
+      </Modal>
+      <Modal
+        open={openZoomedQrModal}
+        onClose={handleCloseZoomedQrModal}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backdropFilter: "blur(3px)",
+        }}
+      >
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            p: 3,
+            maxWidth: "95%",
+            maxHeight: "95%",
+            position: "relative",
+            outline: "none",
+          }}
+        >
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseZoomedQrModal}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: "text.secondary",
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+          <img
+            src={zoomedQrCodeUrl}
+            alt="Mã QR phóng to"
+            style={{
+              minWidth: "90vh",
+              maxWidth: "90vh",
+              display: "block",
+              margin: "0 auto",
+            }}
+          />
+        </Box>
       </Modal>
 
       <Snackbar

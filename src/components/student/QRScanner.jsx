@@ -174,7 +174,7 @@ const QrScanner = () => {
                 startIcon={<ArrowBackIcon />}
                 sx={{ 
                     mb: 3,
-                    right: "22vh", 
+                    display: 'flex',
                     alignSelf: 'flex-start',
                     textTransform: 'none',
                     fontWeight: 600,
@@ -203,7 +203,7 @@ const QrScanner = () => {
                     color={isScanning ? "warning" : "primary"}
                     startIcon={isScanning ? <StopCircleIcon /> : <CameraAltIcon />}
                     sx={{
-                        mb: 3,
+                        mb: 2,
                         py: 1.5,
                         px: 4,
                         fontSize: '1rem',
@@ -234,8 +234,10 @@ const QrScanner = () => {
                     justifyContent: 'center',
                     bgcolor: isScanning ? 'background.default' : 'transparent',
                     boxShadow: isScanning ? 2 : 'none',
+                    flexDirection: 'column',
                     '& button': { marginTop: '10px' },
-                    '& #html5-qrcode-anchor-scan-type-change': { display: 'none' }
+                    '& #html5-qrcode-anchor-scan-type-change': { display: 'none' },
+                    '& #html5-qrcode-camera-selection': { marginTop: '10px' } 
                 }}
             />
 

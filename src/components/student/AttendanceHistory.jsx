@@ -89,7 +89,7 @@ const AttendanceHistory = () => {
                 onClick={() => navigate('/student/dashboard')}
                 sx={{ 
                     mb: 3,
-                    right: "35vh",
+                    display: 'flex',
                     alignSelf: 'flex-start',
                     textTransform: 'none',
                     fontWeight: 600,

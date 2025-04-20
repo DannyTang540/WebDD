@@ -20,6 +20,7 @@ import {
   Input,
   Tabs,
   Tab,
+  TablePagination,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Delete, UploadFile, Group, AddCircleOutline, Search } from "@mui/icons-material";
@@ -57,6 +58,27 @@ const ClassStudents = () => {
 
   const handleTabChange = (event, newValue) => {
     setCurrentTab(newValue);
+  };
+
+  // Pagination state
+  const [page, setPage] = useState(0); // Current page
+  const [rowsPerPage, setRowsPerPage] = useState(5); // Rows per page
+
+  // Calculate the sliced data for the current page
+  const paginatedStudents = students.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  // Handle page change
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset to the first page
   };
 
   // Hàm fetch danh sách sinh viên của lớp
@@ -371,6 +393,19 @@ const ClassStudents = () => {
           }}
         >
           <TableContainer>
+            <Typography
+              variant="h6"
+              sx={{
+                p: 2,
+                fontWeight: 600,
+                textAlign: "center",
+                position: "sticky",
+                top: 0,
+                zIndex: 1,
+              }}
+              >
+            Sĩ số: {students.length}
+            </Typography>
             <Table>
               <TableHead sx={{ bgcolor: "primary.light" }}>
                 <TableRow>
@@ -409,7 +444,7 @@ const ClassStudents = () => {
               </TableHead>
 
               <TableBody>
-                {students.map((student) => (
+                {paginatedStudents.map((student) => (
                   <TableRow
                     key={student.id}
                     hover
@@ -442,6 +477,20 @@ const ClassStudents = () => {
                 ))}
               </TableBody>
             </Table>
+               <TablePagination
+                                rowsPerPageOptions={[5, 10, 25]}
+                                component="div"
+                                count={students.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                labelRowsPerPage="Số lớp mỗi trang:"
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `${from}-${to} trên ${count !== -1 ? count : `hơn ${to}`}`
+                                }
+                                sx={{ mt: 2 }}
+                            />
           </TableContainer>
 
           {loading && (
