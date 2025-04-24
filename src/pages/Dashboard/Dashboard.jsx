@@ -2,9 +2,9 @@ import { Box, Typography, Grid, Paper } from '@mui/material';
 import './Dashboard'
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import QRGenerator from '../components/teacher/QRGenerator';
+import QRGenerator from '../../components/teacher/QRGenerator';
 import QRScanner from './components/student/QRScanner';
-import AttendanceHistory from '../components/student/AttendanceHistory';
+import AttendanceHistory from '../../components/student/AttendanceHistory';
 
 const Dashboard = () => {
   const navigate = useNavigate();
